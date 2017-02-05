@@ -13,12 +13,12 @@ import java.util.ArrayList;
  * Created by rishi on 2017-01-21.
  */
 
-public class Adapter extends ArrayAdapter<Card>{
+public class ReadViewAdapter extends ArrayAdapter<Card>{
     private final Context context;
     private final ArrayList<Card> cardsArrayList;
 
-    public Adapter(Context context, ArrayList<Card> cardsArrayList){
-        super(context, R.layout.listview, cardsArrayList);
+    public ReadViewAdapter(Context context, ArrayList<Card> cardsArrayList){
+        super(context, R.layout.listviewread, cardsArrayList);
 
         this.context = context;
         this.cardsArrayList = cardsArrayList;
@@ -31,7 +31,7 @@ public class Adapter extends ArrayAdapter<Card>{
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         // 2. Get rowView from inflater
-        View rowView = inflater.inflate(R.layout.listview, parent, false);
+        View rowView = inflater.inflate(R.layout.listviewread, parent, false);
 
         // 3. Get the two text view from the rowView
         TextView labelView = (TextView) rowView.findViewById(R.id.label);

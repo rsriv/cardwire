@@ -16,4 +16,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DisplayInfoActivity.class);
         startActivity(intent);
     }
+    protected void myCard (View view){
+        Intent intent = new Intent(this, MyCardActivity.class);
+        startActivity(intent);
+    }
 }

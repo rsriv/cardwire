@@ -1,5 +1,6 @@
 package com.example.rishi.cardwire;
 
+import android.content.Context;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -13,14 +14,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-
 
 public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter.OnNdefPushCompleteCallback,
         NfcAdapter.CreateNdefMessageCallback{
@@ -29,6 +30,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
     private NfcAdapter mNfcAdapter;
     public  ArrayList<Card> myCards = new ArrayList<Card>();
     public  ArrayList<Card> receivedCards = new ArrayList<Card>();
+    public ReadViewAdapter readViewAdapter;
 
     public String createStringfromCards (ArrayList<Card> cards){
         String ret = "";
@@ -59,10 +61,86 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
         return ret;
     }
 
+    public NdefRecord[] createRecords() {
+        String toSend = createStringfromCards(myCards);
+        NdefRecord[] records = new NdefRecord[2];
+        //Older Api
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+
+            byte[] payload = toSend.
+                    getBytes(Charset.forName("UTF-8"));
+            NdefRecord record = new NdefRecord(
+                    NdefRecord.TNF_WELL_KNOWN,      //Our 3-bit Type name format
+                    NdefRecord.RTD_TEXT,            //Description of our payload
+                    new byte[0],                    //The optional id for our Record
+                    payload);                       //Our payload for the Record
+
+            records[0] = record;
+
+        }
+        //Higher api
+        else {
+
+            byte[] payload = toSend.
+                    getBytes(Charset.forName("UTF-8"));
+
+            NdefRecord record = NdefRecord.createMime("text/plain",payload);
+            records[0] = record;
+
+        }
+        records[1] = NdefRecord.createApplicationRecord(getPackageName());
+        return records;
+    }
+
+    public void displayCards(ArrayList<Card> cards){
+        readViewAdapter = new ReadViewAdapter(this, cards);
+        // 2. Get ListView from activity_main.xml
+        ListView listView = (ListView) findViewById(R.id.listviewread);
+        // 3. setListAdapter
+        listView.setAdapter(readViewAdapter);
+    }
+
+    private String readFromFile(Context context) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput("config.txt");
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Toast.makeText(this,"Error: Please Restart CardWire",Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(this,"Error: Please Restart CardWire",Toast.LENGTH_SHORT).show();
+        }
+
+        return ret;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+
         handleNfcIntent(getIntent());
+        if(receivedCards.size() == 0){
+            displayCards(myCards);
+        }
+        else{
+            displayCards(receivedCards);
+        }
     }
 
     @Override
@@ -70,23 +148,19 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_info);
-
         //Load Card Data
-        myCards.add(new Card("Facebook"," www.facebook.com/abc"));
-        myCards.add(new Card("Twitter","www.twitter.com/abc"));
-        myCards.add(new Card("LinkedIn","www.linkedin.com/in/abc"));
+        String cardString = readFromFile(this);
+        myCards = createCardsfromString(cardString);
 
-        //Check if NFC is available on device
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if(mNfcAdapter != null) {
-            //Handle some NFC initialization here
-            //Check if NFC is available on device
+            //Check for NFC
             mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
             if(mNfcAdapter != null) {
-                //This will refer back to createNdefMessage for what it will send
+                //sets createNdefMessage
                 mNfcAdapter.setNdefPushMessageCallback(this, this);
 
-                //This will be called if the message is sent successfully
+                //Successfully sent message
                 mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
             }
         }
@@ -94,77 +168,36 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
             Toast.makeText(this, "NFC not available on this device",
                     Toast.LENGTH_SHORT).show();
         }
-
-        Adapter adapter = new Adapter(this, myCards);
-
-        // 2. Get ListView from activity_main.xml
-        ListView listView = (ListView) findViewById(R.id.listview1);
-
-        // 3. setListAdapter
-        listView.setAdapter(adapter);
-
+        displayCards(myCards);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        displayCards(myCards);
         super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        displayCards(myCards);
         super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    public NdefRecord[] createRecords() {
-        String toSend = createStringfromCards(myCards);
-        NdefRecord[] records = new NdefRecord[2];
-        //To Create Messages Manually if API is less than
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-
-                byte[] payload = toSend.
-                        getBytes(Charset.forName("UTF-8"));
-                NdefRecord record = new NdefRecord(
-                        NdefRecord.TNF_WELL_KNOWN,      //Our 3-bit Type name format
-                        NdefRecord.RTD_TEXT,            //Description of our payload
-                        new byte[0],                    //The optional id for our Record
-                        payload);                       //Our payload for the Record
-
-                records[0] = record;
-
-        }
-        //Api is high enough that we can use createMime, which is preferred.
-        else {
-
-                byte[] payload = toSend.
-                        getBytes(Charset.forName("UTF-8"));
-
-                NdefRecord record = NdefRecord.createMime("text/plain",payload);
-                records[0] = record;
-
-        }
-        records[1] = NdefRecord.createApplicationRecord(getPackageName());
-        return records;
     }
 
     @Override
     public void onNdefPushComplete(NfcEvent event) {
-        //This is called when the system detects that our NdefMessage was
-        //Successfully sent.
+        //Successfully sent
         Toast.makeText(this,"CardWired!",Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        //This will be called when another NFC capable device is detected.
-        //We'll write the createRecords() method in just a moment
         NdefRecord[] recordsToAttach = createRecords();
-        //When creating an NdefMessage we need to provide an NdefRecord[]
         return new NdefMessage(recordsToAttach);
     }
 
     //NFC Receive Methods
     private void handleNfcIntent(Intent NfcIntent) {
-        Log.d("abc","123");
+
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(NfcIntent.getAction())) {
             Parcelable[] receivedArray =
                     NfcIntent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
@@ -179,7 +212,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
                     //Make sure we don't pass along our AAR (Android Application Record)
                     if (string.equals(getPackageName())) { continue; }
                     receivedCards=createCardsfromString(string);
-                    Log.d(receivedCards.get(0).getType(),receivedCards.get(0).getLink());
+                    Log.d(receivedCards.get(2).getType(),receivedCards.get(2).getLink());
                 }
                 Toast.makeText(this, "Received", Toast.LENGTH_LONG).show();
 
@@ -194,6 +227,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
     @Override
     public void onNewIntent(Intent intent) {
         handleNfcIntent(intent);
+        displayCards(receivedCards);
     }
     
     

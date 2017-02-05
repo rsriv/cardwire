@@ -8,10 +8,6 @@ public class Card {
     private String type;
     private String link;
 
-    public Card() {
-        super();
-    }
-
     public Card(String type, String link) {
         super();
         this.type = type;
@@ -23,11 +19,20 @@ public class Card {
         this.type = c.getType();
         this.link = c.getLink();
     }
+
     public String getType (){
         return this.type;
     }
 
     public String getLink (){
         return this.link;
+    }
+
+    public void setType (String type){
+        this.type = type;
+    }
+
+    public void setLink (String link){
+        this.link = link;
     }
 }

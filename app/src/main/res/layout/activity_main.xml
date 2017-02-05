@@ -17,12 +17,21 @@
         android:id="@+id/textView" />
 
     <Button
-        android:text="NFC"
+        android:text="My Card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/button"
-        android:layout_marginBottom="25dp"
-        android:onClick="disp"
+        android:id="@+id/myCard"
+        android:layout_marginBottom="83dp"
+        android:onClick="myCard"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="CardWire"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wire"
+        android:onClick="disp"
+        android:layout_above="@+id/myCard"
+        android:layout_alignStart="@+id/myCard" />
 </RelativeLayout>

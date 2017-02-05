@@ -6,7 +6,7 @@
     tools:context=".DisplayInfoActivity" >
 
         <ListView
-            android:id="@+id/listview1"
+            android:id="@+id/listviewread"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
         </ListView>
