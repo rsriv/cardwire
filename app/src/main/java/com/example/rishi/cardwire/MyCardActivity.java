@@ -18,7 +18,8 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class MyCardActivity extends AppCompatActivity {
-    public  ArrayList<Card> myCards = new ArrayList<Card>();
+    public ArrayList<Card> myCards = new ArrayList<Card>();
+    public ArrayList<Card> cache = new ArrayList<Card>();
     public WriteViewAdapter writeViewAdapter;
 
     public void displayCards(ArrayList<Card> cards){
@@ -109,6 +110,7 @@ public class MyCardActivity extends AppCompatActivity {
             myCards.add(new Card("Twitter", "www.twitter.com/yourlinkhere"));
             myCards.add(new Card("LinkedIn", "https://www.linkedin.com/in/yourlinkhere"));
         }
+        cache = myCards;
         displayCards(myCards);
 
     }
@@ -117,7 +119,7 @@ public class MyCardActivity extends AppCompatActivity {
         //WRITE CARD
         for (int i = 0;i<myCards.size();i++){
             ListView listView = (ListView) findViewById(R.id.listviewwrite);
-            View view= listView.getChildAt(i);
+            View view = listView.getChildAt(i);
             EditText typeField = (EditText) view.findViewById(R.id.typeField);
             EditText linkField = (EditText) view.findViewById(R.id.linkField);
             myCards.get(i).setType(typeField.getText().toString());
@@ -128,6 +130,40 @@ public class MyCardActivity extends AppCompatActivity {
 
         writeToFile(cardString,this);
         Toast.makeText(this,"Card Saved!",Toast.LENGTH_SHORT).show();
+    }
+
+    protected void add (View v){
+        ListView listView = (ListView) findViewById(R.id.listviewwrite);
+        Card newCard = new Card("","");
+        int pos = listView.getPositionForView(v)+1;
+        cache.add(pos,newCard);
+        for (int i = 0;i<cache.size()-1;i++){
+            View view = listView.getChildAt(i);
+            EditText typeField = (EditText) view.findViewById(R.id.typeField);
+            EditText linkField = (EditText) view.findViewById(R.id.linkField);
+            cache.get(i).setType(typeField.getText().toString());
+            cache.get(i).setLink(linkField.getText().toString());
+        }
+        displayCards(cache);
+    }
+
+    protected void delete (View v){
+        ListView listView = (ListView) findViewById(R.id.listviewwrite);
+        int pos = listView.getPositionForView(v);
+        for (int i = 0;i<cache.size();i++){
+            View view = listView.getChildAt(i);
+            EditText typeField = (EditText) view.findViewById(R.id.typeField);
+            EditText linkField = (EditText) view.findViewById(R.id.linkField);
+            cache.get(i).setType(typeField.getText().toString());
+            cache.get(i).setLink(linkField.getText().toString());
+        }
+        if (cache.size() > 1) {
+            cache.remove(pos);
+            displayCards(cache);
+        }
+        else {
+            //do nothing
+        }
     }
 
 }
