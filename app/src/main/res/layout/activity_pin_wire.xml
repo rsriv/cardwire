@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_pin_wire"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.rishi.cardwire.PinWireActivity">
+
+    <ImageView
+        android:src="@drawable/listback"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scaleType="centerCrop"
+        android:padding="0dp"
+        android:cropToPadding="false"
+        android:adjustViewBounds="false"
+        />
+
+    <Button
+        android:text="Add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/button"
+        android:textColor="@color/textclr"
+        android:onClick="addUser"/>
+
+    <TextView
+        android:text="Add By PIN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pin_activity_title"
+        android:textColor="@color/textclr"
+        android:textSize="30sp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="105dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="Enter Pin Here"
+        android:ems="10"
+        android:layout_marginTop="60dp"
+        android:id="@+id/add_pin"
+        android:singleLine="true"
+        android:textAlignment="center"
+        android:textColor="@color/textclr"
+        android:background="@drawable/button"
+        android:alpha="0.92"
+        android:layout_alignTop="@+id/pin_activity_title"
+        android:layout_centerHorizontal="true" />
+
+
+</RelativeLayout>

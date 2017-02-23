@@ -1,14 +1,23 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".DisplayInfoActivity" >
-
+    tools:context=".DisplayInfoActivity"
+    android:background="#3ca3f1">
+        <ImageView
+            android:src="@drawable/listback"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scaleType="centerCrop"
+            android:padding="0dp"
+            android:cropToPadding="false"
+            android:adjustViewBounds="false"
+            />
         <ListView
             android:id="@+id/listviewread"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
         </ListView>
 
-</LinearLayout>
+</RelativeLayout>

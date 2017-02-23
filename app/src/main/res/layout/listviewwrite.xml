@@ -2,7 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/relLayout">
+    android:id="@+id/relLayout"
+    android:background="@color/listitemback"
+    android:alpha="0.8"
+    android:minHeight="60dp"
+    >
+
 
     <EditText
         android:layout_width="161dp"
@@ -13,7 +18,8 @@
         android:id="@+id/typeField"
         android:layout_toStartOf="@+id/linkField"
         android:layout_alignParentStart="true"
-        android:width="20dp"/>
+        android:width="20dp"
+        android:textColor="@color/textclr"/>
 
     <EditText
         android:layout_width="136dp"
@@ -23,7 +29,8 @@
         android:ems="10"
         android:id="@+id/linkField"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/textclr"/>
 
     <GridLayout
         android:id="@+id/grid"
@@ -34,25 +41,31 @@
         android:layout_toEndOf="@+id/linkField"
         android:layout_marginStart="20dp"
         android:columnCount="2"
-        android:layout_alignBottom="@+id/linkField">
+        android:layout_alignBottom="@+id/linkField"
+        >
 
-        <Button
-            android:text="+"
+        <ImageButton
             android:layout_width="48dp"
             android:layout_height="wrap_content"
             android:id="@+id/button11"
             android:layout_gravity="fill"
             android:layout_columnWeight="1"
-            android:onClick="add" />
+            android:onClick="add"
+            android:src="@drawable/add"
+            android:scaleType="fitCenter"
+            android:background="#FFF"
+            />
 
-        <Button
-            android:text="-"
+        <ImageButton
             android:layout_width="47dp"
             android:layout_height="wrap_content"
             android:id="@+id/button10"
             android:layout_gravity="fill"
             android:layout_columnWeight="1"
-            android:onClick="delete" />
+            android:onClick="delete"
+            android:src="@drawable/remove"
+            android:scaleType="fitCenter"
+            android:background="#FFF"/>
     </GridLayout>
 
 </RelativeLayout>

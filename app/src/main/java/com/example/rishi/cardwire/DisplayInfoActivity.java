@@ -2,6 +2,7 @@ package com.example.rishi.cardwire;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 
 public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter.OnNdefPushCompleteCallback,
         NfcAdapter.CreateNdefMessageCallback{
+
+
 
 
     private NfcAdapter mNfcAdapter;
@@ -70,10 +73,10 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
             byte[] payload = toSend.
                     getBytes(Charset.forName("UTF-8"));
             NdefRecord record = new NdefRecord(
-                    NdefRecord.TNF_WELL_KNOWN,      //Our 3-bit Type name format
-                    NdefRecord.RTD_TEXT,            //Description of our payload
-                    new byte[0],                    //The optional id for our Record
-                    payload);                       //Our payload for the Record
+                    NdefRecord.TNF_WELL_KNOWN,
+                    NdefRecord.RTD_TEXT,
+                    new byte[0],
+                    payload);
 
             records[0] = record;
 
@@ -93,24 +96,24 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
     }
 
     public void displayCards(ArrayList<Card> cards){
-        readViewAdapter = new ReadViewAdapter(this, cards);
+        readViewAdapter = new ReadViewAdapter(DisplayInfoActivity.this, cards);
         // 2. Get ListView from activity_main.xml
         ListView listView = (ListView) findViewById(R.id.listviewread);
         // 3. setListAdapter
         listView.setAdapter(readViewAdapter);
     }
 
-    private String readFromFile(Context context) {
+    private String readFromFile() {
 
         String ret = "";
 
         try {
-            InputStream inputStream = context.openFileInput("config.txt");
+            InputStream inputStream = this.openFileInput("config.txt");
 
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
+                String receiveString;
                 StringBuilder stringBuilder = new StringBuilder();
 
                 while ( (receiveString = bufferedReader.readLine()) != null ) {
@@ -133,9 +136,11 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
     @Override
     public void onResume() {
         super.onResume();
-
+        String cardString = readFromFile();
+        myCards = createCardsfromString(cardString);
         handleNfcIntent(getIntent());
         if(receivedCards.size() == 0){
+
             displayCards(myCards);
         }
         else{
@@ -149,7 +154,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_info);
         //Load Card Data
-        String cardString = readFromFile(this);
+        String cardString = readFromFile();
         myCards = createCardsfromString(cardString);
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -173,12 +178,16 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        String cardString = readFromFile();
+        myCards = createCardsfromString(cardString);
         displayCards(myCards);
         super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        String cardString = readFromFile();
+        myCards = createCardsfromString(cardString);
         displayCards(myCards);
         super.onRestoreInstanceState(savedInstanceState);
     }

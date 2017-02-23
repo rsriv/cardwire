@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="horizontal">
-
+    android:orientation="horizontal"
+    android:background="#7feaf4"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:src="@drawable/listitemback"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scaleType="centerCrop"
+        android:padding="0dp"
+        android:cropToPadding="false"
+        android:adjustViewBounds="false"
+        />
     <TextView
         android:id="@+id/label"
         android:layout_width="wrap_content"
@@ -12,10 +21,9 @@
         android:padding="10dip"
         android:textSize="16dip"
         android:textStyle="bold"
-        android:layout_marginBottom="94dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/link"
-
+        android:textColor="#FFF"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
         >
     </TextView>
 
@@ -26,9 +34,10 @@
     android:padding="10dip"
     android:textSize="16dip"
     android:textStyle="bold"
-        android:layout_alignBottom="@+id/label"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:autoLink="web|all" />
+        android:autoLink="web|all"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/label"
+        android:textColorLink="@color/textclr"
+        android:textColor="@color/textclr"/>
 
-</LinearLayout>
+</RelativeLayout>

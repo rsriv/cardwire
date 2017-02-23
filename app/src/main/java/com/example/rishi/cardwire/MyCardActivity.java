@@ -39,6 +39,7 @@ public class MyCardActivity extends AppCompatActivity {
         return ret;
     }
 
+
     public ArrayList<Card> createCardsfromString (String s){
         String[] separated = s.split(";");
         String temp = "";
