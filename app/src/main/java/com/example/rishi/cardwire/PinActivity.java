@@ -50,6 +50,7 @@ public class PinActivity extends AppCompatActivity {
         }
     };
 
+
     private void writePin (String newPin){
         SharedPreferences pref = getSharedPreferences("PREF_GENERIC", Context.MODE_PRIVATE);
         pref.edit().putString(getString(R.string.pin_key), newPin).apply();
@@ -96,6 +97,7 @@ public class PinActivity extends AppCompatActivity {
 
         mSocket.on("new user",onNewMessage);
         mSocket.connect();
+
         mSocket.emit("new user", "Return me a pin"); // TO HERE
         String pin = readPin();
 

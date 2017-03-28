@@ -5,5 +5,6 @@ package com.example.rishi.cardwire;
  */
 
 public class Constants {
-    public static final String SERVER_URL = "http";
+    public static final String SERVER_URL = "here";
+
 }
