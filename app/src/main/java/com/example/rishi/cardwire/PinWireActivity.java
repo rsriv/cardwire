@@ -2,6 +2,7 @@ package com.example.rishi.cardwire;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -67,7 +68,15 @@ public class PinWireActivity extends AppCompatActivity {
 
                     }
                     else { //response is yes
-
+                        Log.d("Response: ","YES");
+                        Intent intent = new Intent(PinWireActivity.this, DisplayInfoActivity.class);
+                        String message = "";
+                        try {
+                            message = data.getString("card");
+                        }
+                        catch (JSONException e){}
+                        intent.putExtra("card", message);
+                        startActivity(intent);
                     }
                 }
             });

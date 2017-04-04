@@ -27,9 +27,6 @@ import java.util.ArrayList;
 public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter.OnNdefPushCompleteCallback,
         NfcAdapter.CreateNdefMessageCallback{
 
-
-
-
     private NfcAdapter mNfcAdapter;
     public  ArrayList<Card> myCards = new ArrayList<Card>();
     public  ArrayList<Card> receivedCards = new ArrayList<Card>();
@@ -154,7 +151,12 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_info);
         //Load Card Data
-        String cardString = readFromFile();
+        Intent intent = getIntent();
+        String cardString = intent.getExtras().getString("card");
+
+        if(cardString==null) {
+            cardString = readFromFile();
+        }
         myCards = createCardsfromString(cardString);
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
