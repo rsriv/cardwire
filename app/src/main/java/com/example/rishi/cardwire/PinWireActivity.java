@@ -1,7 +1,9 @@
 package com.example.rishi.cardwire;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,7 +28,53 @@ import java.net.URISyntaxException;
 public class PinWireActivity extends AppCompatActivity {
     SocketApplication app;
     private Socket mSocket;
-    private Emitter.Listener msg = new Emitter.Listener() {
+
+    private Emitter.Listener addResp = new Emitter.Listener() { //called when add response is received
+
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    Log.d("add ", "response");
+                    JSONObject data = (JSONObject) args[0];
+                    final String resp;
+                    final String from;
+                    try {
+                        //pin = data.getString("card");
+                        resp = data.getString("response");
+                        from = data.getString("to");
+                        Log.d("response: ", resp);
+                    } catch (JSONException e) {
+                        return;
+                    }
+                    if (resp.equals("n")) {
+                        AlertDialog.Builder box = new AlertDialog.Builder(PinWireActivity.this);
+                        box.setMessage(from + " rejected your request")
+                                .setCancelable(false)
+                                .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        dialog.cancel();
+                                    }
+                                });
+                        AlertDialog alert = box.create();
+                        alert.setTitle("Response from " + from);
+                        alert.show();
+
+
+                    }
+                    else { //response is yes
+
+                    }
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener addReq = new Emitter.Listener() { //called when add request is received
 
         @Override
         public void call(final Object... args) {
@@ -36,13 +84,54 @@ public class PinWireActivity extends AppCompatActivity {
                 public void run() {
                     Log.d("test ","abc");
                     JSONObject data = (JSONObject) args[0];
-                    String pin;
+                    final String pin;
                     try {
-                        pin = data.getString("card");
+                        //pin = data.getString("card");
+                        pin = data.getString("from");
+                        String from = data.getString("to");
                         Log.d("card: ",pin);
                     } catch (JSONException e) {
                         return;
                     }
+                    AlertDialog.Builder box = new AlertDialog.Builder(PinWireActivity.this);
+                    box.setMessage("Share card with " + pin+"?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog, int id){
+                                    //send add response yes
+                                    JSONObject obj = new JSONObject();
+                                    String card = readFromFile();
+                                    try {
+                                        obj.put("response", "y");
+                                        obj.put("to", pin);
+                                        obj.put("from", readPin());
+                                        obj.put("card", card);
+                                    }
+                                    catch (JSONException x){}
+                                    Log.d("Sent ","YES");
+                                    mSocket.emit("add response", obj);
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog, int id){
+                                    //send add response yes
+                                    JSONObject obj = new JSONObject();
+                                    try {
+                                        obj.put("response", "n");
+                                        obj.put("to", pin);
+                                        obj.put("from", readPin());
+                                    }
+                                    catch (JSONException x){}
+                                    Log.d("Sent ","NO");
+                                    mSocket.emit("add response", obj);
+                                    dialog.cancel();
+                                }
+                            });
+                    AlertDialog alert =  box.create();
+                    alert.setTitle("Request from "+pin);
+                    alert.show();
 
 
                 }
@@ -128,7 +217,8 @@ public class PinWireActivity extends AppCompatActivity {
             }
 
         }
-        mSocket.on("add req",msg);
+        mSocket.on("add request",addReq);
+        mSocket.on("add response",addResp);
         mSocket.connect();
     }
 }
