@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="textclr"> #f9dc39</color>
+    <color name="hinttextclr">#fcefac</color>
     <color name="listitemback">#3159c9</color>
 </resources>

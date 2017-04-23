@@ -9,4 +9,6 @@
     <string name="pref_previously_started"></string>
     <string name="pin_key_default">0</string>
     <string name="pin_key">none</string>
+    <string name="type_hint"><i>Profile Type</i></string>
+    <string name="link_hint"><i>Link to Profile</i></string>
 </resources>

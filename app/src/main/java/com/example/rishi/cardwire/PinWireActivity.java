@@ -29,7 +29,7 @@ import java.net.URISyntaxException;
 public class PinWireActivity extends AppCompatActivity {
     SocketApplication app;
     private Socket mSocket;
-
+    private Context context;
     private Emitter.Listener addResp = new Emitter.Listener() { //called when add response is received
 
         @Override
@@ -51,7 +51,7 @@ public class PinWireActivity extends AppCompatActivity {
                         return;
                     }
                     if (resp.equals("n")) {
-                        AlertDialog.Builder box = new AlertDialog.Builder(PinWireActivity.this);
+                        AlertDialog.Builder box = new AlertDialog.Builder(context);
                         box.setMessage(from + " rejected your request")
                                 .setCancelable(false)
                                 .setNegativeButton("OK", new DialogInterface.OnClickListener() {
@@ -69,12 +69,14 @@ public class PinWireActivity extends AppCompatActivity {
                     }
                     else { //response is yes
                         Log.d("Response: ","YES");
-                        Intent intent = new Intent(PinWireActivity.this, DisplayInfoActivity.class);
+                        Intent intent = new Intent(context, DisplayInfoActivity.class);
                         String message = "";
                         try {
                             message = data.getString("card");
                         }
+
                         catch (JSONException e){}
+                        Log.d("Card: ",message);
                         intent.putExtra("card", message);
                         startActivity(intent);
                     }
@@ -92,7 +94,7 @@ public class PinWireActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     Log.d("test ","abc");
-                    JSONObject data = (JSONObject) args[0];
+                    final JSONObject data = (JSONObject) args[0];
                     final String pin;
                     try {
                         //pin = data.getString("card");
@@ -102,7 +104,7 @@ public class PinWireActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         return;
                     }
-                    AlertDialog.Builder box = new AlertDialog.Builder(PinWireActivity.this);
+                    AlertDialog.Builder box = new AlertDialog.Builder(context);
                     box.setMessage("Share card with " + pin+"?")
                             .setCancelable(false)
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener(){
@@ -111,6 +113,7 @@ public class PinWireActivity extends AppCompatActivity {
                                     //send add response yes
                                     JSONObject obj = new JSONObject();
                                     String card = readFromFile();
+                                    Log.d("Card Sent from usr: ",card);
                                     try {
                                         obj.put("response", "y");
                                         obj.put("to", pin);
@@ -120,6 +123,18 @@ public class PinWireActivity extends AppCompatActivity {
                                     catch (JSONException x){}
                                     Log.d("Sent ","YES");
                                     mSocket.emit("add response", obj);
+
+
+                                    Intent intent = new Intent(context, DisplayInfoActivity.class);
+                                    String message = "";
+                                    try {
+                                        message = data.getString("card");
+                                    }
+
+                                    catch (JSONException e){}
+                                    Log.d("Card: ",message);
+                                    intent.putExtra("card", message);
+                                    startActivity(intent);
                                 }
                             })
                             .setNegativeButton("No", new DialogInterface.OnClickListener(){
@@ -187,6 +202,7 @@ public class PinWireActivity extends AppCompatActivity {
     }
 
     public void addUser (View v) {
+        mSocket.emit("join", readPin());
         JSONObject obj = new JSONObject();
         EditText e = (EditText) findViewById(R.id.add_pin);
         String to = e.getText().toString();
@@ -206,7 +222,7 @@ public class PinWireActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pin_wire);
-
+        context = this;
         app = (SocketApplication) getApplication();
         Log.d(app.getSocket().toString(),"");
 
@@ -229,5 +245,13 @@ public class PinWireActivity extends AppCompatActivity {
         mSocket.on("add request",addReq);
         mSocket.on("add response",addResp);
         mSocket.connect();
+        mSocket.emit("join", readPin());
+    }
+
+    @Override
+    protected void onResume (){
+        super.onResume();
+        mSocket.emit("join", readPin());
+
     }
 }

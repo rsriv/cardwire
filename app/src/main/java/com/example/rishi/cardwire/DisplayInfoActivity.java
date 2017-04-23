@@ -153,8 +153,9 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
         //Load Card Data
         Intent intent = getIntent();
         String cardString = intent.getExtras().getString("card");
-
-        if(cardString==null) {
+        Log.d("CardString ",cardString);
+        if(cardString==null || cardString.equals("")) {
+            Log.d("CARDSTRING NULL","");
             cardString = readFromFile();
         }
         myCards = createCardsfromString(cardString);
@@ -175,6 +176,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
             Toast.makeText(this, "NFC not available on this device",
                     Toast.LENGTH_SHORT).show();
         }
+        Log.d("CardString 2",myCards.get(0).getLink());
         displayCards(myCards);
     }
 

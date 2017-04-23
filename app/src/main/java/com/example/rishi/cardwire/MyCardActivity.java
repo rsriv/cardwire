@@ -91,7 +91,7 @@ public class MyCardActivity extends AppCompatActivity {
             }
         }
         catch (FileNotFoundException e) {
-            Toast.makeText(this,"Error: Please Restart CardWire",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Internal Error",Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             Toast.makeText(this,"Error: Please Restart CardWire",Toast.LENGTH_SHORT).show();
         }
