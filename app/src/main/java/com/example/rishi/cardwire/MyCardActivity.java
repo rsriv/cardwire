@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
@@ -133,22 +134,28 @@ public class MyCardActivity extends AppCompatActivity {
         Toast.makeText(this,"Card Saved!",Toast.LENGTH_SHORT).show();
     }
 
-    protected void add (View v){
+    public void add (View v){
+        Log.d("poo","abc");
         ListView listView = (ListView) findViewById(R.id.listviewwrite);
         Card newCard = new Card("","");
         int pos = listView.getPositionForView(v)+1;
-        cache.add(pos,newCard);
-        for (int i = 0;i<cache.size()-1;i++){
+        Log.d("num ", Integer.toString(pos));
+        for (int i = 0;i<cache.size();i++){
             View view = listView.getChildAt(i);
             EditText typeField = (EditText) view.findViewById(R.id.typeField);
             EditText linkField = (EditText) view.findViewById(R.id.linkField);
             cache.get(i).setType(typeField.getText().toString());
             cache.get(i).setLink(linkField.getText().toString());
+            Log.d(Integer.toString(i)+" Type: "+cache.get(i).getType() + " Link: "+cache.get(i).getLink(),"here");
         }
+        cache.add(pos,newCard);
+
+
+        Log.d(Integer.toString(cache.size()-1)+" Type: "+cache.get(cache.size()-1).getType() + " Link: "+cache.get(cache.size()-1).getLink(),"here");
         displayCards(cache);
     }
 
-    protected void delete (View v){
+    public void delete (View v){
         ListView listView = (ListView) findViewById(R.id.listviewwrite);
         int pos = listView.getPositionForView(v);
         for (int i = 0;i<cache.size();i++){

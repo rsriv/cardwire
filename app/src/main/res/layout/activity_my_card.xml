@@ -17,7 +17,10 @@
     <ListView
         android:id="@+id/listviewwrite"
         android:layout_width="match_parent"
-        android:layout_height="461dp" >
+        android:layout_height="461dp"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/saveButton"
+        android:layout_marginBottom="35dp">
     </ListView>
 
     <Button
@@ -25,6 +28,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom ="true"
+        android:background="@drawable/button"
+        android:textColor="@color/textclr"
         android:id="@+id/saveButton"
         android:onClick="saveCard" />
 

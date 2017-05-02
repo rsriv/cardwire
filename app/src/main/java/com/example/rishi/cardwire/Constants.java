@@ -5,6 +5,6 @@ package com.example.rishi.cardwire;
  */
 
 public class Constants {
-    public static final String SERVER_URL = "";
+    public static final String SERVER_URL = "http://88c2e276.ngrok.io";
 
 }

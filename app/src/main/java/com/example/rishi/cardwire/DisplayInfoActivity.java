@@ -31,7 +31,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
     public  ArrayList<Card> myCards = new ArrayList<Card>();
     public  ArrayList<Card> receivedCards = new ArrayList<Card>();
     public ReadViewAdapter readViewAdapter;
-
+    public String cardString = "";
     public String createStringfromCards (ArrayList<Card> cards){
         String ret = "";
         for (int i = 0; i<cards.size();i++){
@@ -98,6 +98,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
         ListView listView = (ListView) findViewById(R.id.listviewread);
         // 3. setListAdapter
         listView.setAdapter(readViewAdapter);
+
     }
 
     private String readFromFile() {
@@ -131,28 +132,13 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        String cardString = readFromFile();
-        myCards = createCardsfromString(cardString);
-        handleNfcIntent(getIntent());
-        if(receivedCards.size() == 0){
-
-            displayCards(myCards);
-        }
-        else{
-            displayCards(receivedCards);
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_info);
         //Load Card Data
         Intent intent = getIntent();
-        String cardString = intent.getExtras().getString("card");
+        cardString = intent.getExtras().getString("card");
         Log.d("CardString ",cardString);
         if(cardString==null || cardString.equals("")) {
             Log.d("CARDSTRING NULL","");
@@ -176,24 +162,50 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
             Toast.makeText(this, "NFC not available on this device",
                     Toast.LENGTH_SHORT).show();
         }
-        Log.d("CardString 2",myCards.get(0).getLink());
         displayCards(myCards);
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
-        String cardString = readFromFile();
+    public void onResume() {
+        super.onResume();
+        if(cardString==null || cardString.equals("")) {
+            cardString = readFromFile();
+
         myCards = createCardsfromString(cardString);
-        displayCards(myCards);
+        handleNfcIntent(getIntent());
+        if(receivedCards.size() == 0){
+
+            displayCards(myCards);
+        }
+        else{
+            displayCards(receivedCards);
+        }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+
+        if(cardString==null || cardString.equals("")) {
+            cardString = readFromFile();
+            myCards = createCardsfromString(cardString);
+
+            displayCards(myCards);
+        }
         super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        String cardString = readFromFile();
-        myCards = createCardsfromString(cardString);
-        displayCards(myCards);
+        if(cardString==null || cardString.equals("")) {
+            cardString = readFromFile();
+            String cardString = readFromFile();
+            myCards = createCardsfromString(cardString);
+
+            displayCards(myCards);
+        }
         super.onRestoreInstanceState(savedInstanceState);
+
     }
 
     @Override
@@ -225,7 +237,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
                     //Make sure we don't pass along our AAR (Android Application Record)
                     if (string.equals(getPackageName())) { continue; }
                     receivedCards=createCardsfromString(string);
-                    Log.d(receivedCards.get(2).getType(),receivedCards.get(2).getLink());
+                    //Log.d(receivedCards.get(2).getType(),receivedCards.get(2).getLink());
                 }
                 Toast.makeText(this, "Received", Toast.LENGTH_LONG).show();
 

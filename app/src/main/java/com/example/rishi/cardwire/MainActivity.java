@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     SocketApplication app;
     private Socket mSocket;
-    private Context context;
+    final Context context = this;
+    private boolean isRunning = false;
     private Emitter.Listener addResp = new Emitter.Listener() { //called when add response is received
 
         @Override
@@ -59,34 +60,35 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     if (resp.equals("n")) {
-                        AlertDialog.Builder box = new AlertDialog.Builder(context);
-                        box.setMessage(from + " rejected your request")
-                                .setCancelable(false)
-                                .setNegativeButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int id) {
+                        if(isRunning) {
+                            AlertDialog.Builder box = new AlertDialog.Builder(MainActivity.this);
+                            box.setMessage(from + " rejected your request")
+                                    .setCancelable(false)
+                                    .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int id) {
 
-                                        dialog.cancel();
-                                    }
-                                });
-                        AlertDialog alert = box.create();
-                        alert.setTitle("Response from " + from);
-                        alert.show();
-
-
+                                            dialog.cancel();
+                                        }
+                                    });
+                            AlertDialog alert = box.create();
+                            alert.setTitle("Response from " + from);
+                            alert.show();
+                        }
                     }
                     else { //response is yes
-                        Log.d("Response: ","YES");
-                        Intent intent = new Intent(context, DisplayInfoActivity.class);
-                        String message = "";
-                        try {
-                            message = data.getString("card");
+                        if(isRunning) {
+                            Log.d("Response: ", "YES");
+                            Intent intent = new Intent(context, DisplayInfoActivity.class);
+                            String message = "";
+                            try {
+                                message = data.getString("card");
+                            } catch (JSONException e) {
+                            }
+                            Log.d("Card: ", message);
+                            intent.putExtra("card", message);
+                            startActivity(intent);
                         }
-
-                        catch (JSONException e){}
-                        Log.d("Card: ",message);
-                        intent.putExtra("card", message);
-                        startActivity(intent);
                     }
                 }
             });
@@ -101,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void run() {
-                    Log.d("test ","abc");
                     final JSONObject data = (JSONObject) args[0];
                     final String pin;
                     try {
@@ -112,60 +113,60 @@ public class MainActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         return;
                     }
-                    AlertDialog.Builder box = new AlertDialog.Builder(context);
-                    box.setMessage("Share card with " + pin+"?")
-                            .setCancelable(false)
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener(){
-                                @Override
-                                public void onClick(DialogInterface dialog, int id){
-                                    //send add response yes
-                                    JSONObject obj = new JSONObject();
-                                    String card = readFromFile();
-                                    Log.d("Card Sent from usr: ",card);
-                                    try {
-                                        obj.put("response", "y");
-                                        obj.put("to", pin);
-                                        obj.put("from", readPin());
-                                        obj.put("card", card);
+                    if(isRunning) {
+                        AlertDialog.Builder box = new AlertDialog.Builder(MainActivity.this);
+                        box.setMessage("Share card with " + pin + "?")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        //send add response yes
+                                        JSONObject obj = new JSONObject();
+                                        String card = readFromFile();
+                                        Log.d("Card Sent from usr: ", card);
+                                        try {
+                                            obj.put("response", "y");
+                                            obj.put("to", pin);
+                                            obj.put("from", readPin());
+                                            obj.put("card", card);
+                                        } catch (JSONException x) {
+                                        }
+                                        Log.d("Sent ", "YES");
+                                        mSocket.emit("add response", obj);
+
+
+                                        Intent intent = new Intent(context, DisplayInfoActivity.class);
+                                        String message = "";
+                                        try {
+                                            message = data.getString("card");
+                                        } catch (JSONException e) {
+                                        }
+                                        Log.d("Card: ", message);
+                                        intent.putExtra("card", message);
+                                        startActivity(intent);
                                     }
-                                    catch (JSONException x){}
-                                    Log.d("Sent ","YES");
-                                    mSocket.emit("add response", obj);
-
-
-                                    Intent intent = new Intent(context, DisplayInfoActivity.class);
-                                    String message = "";
-                                    try {
-                                        message = data.getString("card");
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        //send add response yes
+                                        JSONObject obj = new JSONObject();
+                                        try {
+                                            obj.put("response", "n");
+                                            obj.put("to", pin);
+                                            obj.put("from", readPin());
+                                        } catch (JSONException x) {
+                                        }
+                                        Log.d("Sent ", "NO");
+                                        mSocket.emit("add response", obj);
+                                        dialog.cancel();
                                     }
+                                });
+                        AlertDialog alert = box.create();
+                        alert.setTitle("Request from " + pin);
+                        alert.show();
 
-                                    catch (JSONException e){}
-                                    Log.d("Card: ",message);
-                                    intent.putExtra("card", message);
-                                    startActivity(intent);
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener(){
-                                @Override
-                                public void onClick(DialogInterface dialog, int id){
-                                    //send add response yes
-                                    JSONObject obj = new JSONObject();
-                                    try {
-                                        obj.put("response", "n");
-                                        obj.put("to", pin);
-                                        obj.put("from", readPin());
-                                    }
-                                    catch (JSONException x){}
-                                    Log.d("Sent ","NO");
-                                    mSocket.emit("add response", obj);
-                                    dialog.cancel();
-                                }
-                            });
-                    AlertDialog alert =  box.create();
-                    alert.setTitle("Request from "+pin);
-                    alert.show();
-
-
+                    }
                 }
             });
         }
@@ -204,10 +205,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context = this;
         app = (SocketApplication) getApplication();
 
-        Log.d(app.getSocket().toString(),"");
+        //Log.d(app.getSocket().toString(),"");
 
         //Initialize socket
         try {
@@ -273,7 +273,13 @@ public class MainActivity extends AppCompatActivity {
         TextView pinView = (TextView) findViewById(R.id.my_pin_view);
         pinView.setText("My Pin: "+readPin());
         mSocket.emit("join", readPin());
+        isRunning = true;
+    }
 
+    @Override
+    protected void onPause(){
+        super.onPause();
+        isRunning = false;
     }
 
     private String readPin (){

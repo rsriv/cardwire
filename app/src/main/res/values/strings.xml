@@ -11,4 +11,5 @@
     <string name="pin_key">none</string>
     <string name="type_hint"><i>Profile Type</i></string>
     <string name="link_hint"><i>Link to Profile</i></string>
+    <string name="pin_hint"><i>Enter Pin Here</i></string>
 </resources>

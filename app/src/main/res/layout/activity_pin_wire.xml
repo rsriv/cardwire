@@ -43,7 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
-        android:text="Enter Pin Here"
+        android:hint="@string/pin_hint"
         android:ems="10"
         android:layout_marginTop="60dp"
         android:id="@+id/add_pin"
