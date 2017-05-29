@@ -1,4 +1,4 @@
-package com.example.rishi.cardwire;
+package com.mapps.rishi.cardwire;
 
 import org.junit.Test;
 

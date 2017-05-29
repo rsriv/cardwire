@@ -1,10 +1,9 @@
-package com.example.rishi.cardwire;
+package com.mapps.rishi.cardwire;
 
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
-import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 

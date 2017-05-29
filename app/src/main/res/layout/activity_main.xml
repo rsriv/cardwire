@@ -4,7 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.rishi.cardwire.MainActivity"
+    tools:context="com.mapps.rishi.cardwire.MainActivity"
     >
     <ImageView
         android:src="@drawable/homeback"
@@ -77,6 +77,19 @@
         android:id="@+id/my_pin_view"
         android:textSize="25sp"
         android:textColor="@color/textclr"/>
+
+    <Button
+        android:text="Help"
+        android:id="@+id/button"
+        android:background="@drawable/hbutton"
+        android:alpha="0.9"
+        android:textColor="@color/textclr"
+        android:layout_width="100dp"
+        android:layout_alignParentEnd="true"
+        android:layout_height="40dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:onClick="help" />
 
 
 </RelativeLayout>

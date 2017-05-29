@@ -4,11 +4,11 @@ android {
     compileSdkVersion 25
     buildToolsVersion "24.0.1"
     defaultConfig {
-        applicationId "com.example.rishi.cardwire"
+        applicationId "com.mapps.rishi.cardwire"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "3.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

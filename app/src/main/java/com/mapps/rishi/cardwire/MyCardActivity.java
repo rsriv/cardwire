@@ -1,4 +1,4 @@
-package com.example.rishi.cardwire;
+package com.mapps.rishi.cardwire;
 
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
@@ -22,11 +21,11 @@ public class MyCardActivity extends AppCompatActivity {
     public ArrayList<Card> myCards = new ArrayList<Card>();
     public ArrayList<Card> cache = new ArrayList<Card>();
     public WriteViewAdapter writeViewAdapter;
-
+    public ListView listView;
     public void displayCards(ArrayList<Card> cards){
-        writeViewAdapter = new WriteViewAdapter(this, cards);
-        ListView listView = (ListView) findViewById(R.id.listviewwrite);
-        listView.setAdapter(writeViewAdapter);
+
+
+
     }
 
     public String createStringfromCards (ArrayList<Card> cards){
@@ -105,6 +104,7 @@ public class MyCardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_card);
 
+
         String cardString = readFromFile(this);
         myCards = createCardsfromString(cardString);
         if (myCards.size() == 0) {
@@ -112,62 +112,82 @@ public class MyCardActivity extends AppCompatActivity {
             myCards.add(new Card("Twitter", "www.twitter.com/yourlinkhere"));
             myCards.add(new Card("LinkedIn", "https://www.linkedin.com/in/yourlinkhere"));
         }
-        cache = myCards;
-        displayCards(myCards);
+        cache.clear();
+        cache.addAll(myCards);
+        writeViewAdapter = new WriteViewAdapter(this, cache);
+        listView = (ListView) findViewById(R.id.listviewwrite);
+        listView.setAdapter(writeViewAdapter);
+        writeViewAdapter.notifyDataSetChanged();
+        //displayCards(myCards);
 
     }
 
-    protected void saveCard (View v){
+    public void saveCard (View v){
         //WRITE CARD
-        for (int i = 0;i<myCards.size();i++){
+        for (int i = 0;i<cache.size();i++){
             ListView listView = (ListView) findViewById(R.id.listviewwrite);
-            View view = listView.getChildAt(i);
+            View view = writeViewAdapter.getViewByPosition(i,listView);
             EditText typeField = (EditText) view.findViewById(R.id.typeField);
             EditText linkField = (EditText) view.findViewById(R.id.linkField);
-            myCards.get(i).setType(typeField.getText().toString());
-            myCards.get(i).setLink(linkField.getText().toString());
+            cache.get(i).setType(typeField.getText().toString());
+            cache.get(i).setLink(linkField.getText().toString());
         }
-
-        String cardString = createStringfromCards(myCards);
+        myCards.clear();
+        myCards.addAll(cache);
+        String cardString = createStringfromCards(cache);
 
         writeToFile(cardString,this);
         Toast.makeText(this,"Card Saved!",Toast.LENGTH_SHORT).show();
     }
 
     public void add (View v){
-        Log.d("poo","abc");
-        ListView listView = (ListView) findViewById(R.id.listviewwrite);
         Card newCard = new Card("","");
         int pos = listView.getPositionForView(v)+1;
-        Log.d("num ", Integer.toString(pos));
-        for (int i = 0;i<cache.size();i++){
-            View view = listView.getChildAt(i);
+        Log.d("num ", Integer.toString(pos) + " listView.getCount() "+ Integer.toString(listView.getCount()) + " VS. cache.size()" +  Integer.toString(cache.size()));
+
+        //PROBLEM IS HERE
+        for (int i = 0;i<listView.getCount()-1;i++){
+            View view = writeViewAdapter.getViewByPosition(i,listView);
             EditText typeField = (EditText) view.findViewById(R.id.typeField);
             EditText linkField = (EditText) view.findViewById(R.id.linkField);
             cache.get(i).setType(typeField.getText().toString());
             cache.get(i).setLink(linkField.getText().toString());
             Log.d(Integer.toString(i)+" Type: "+cache.get(i).getType() + " Link: "+cache.get(i).getLink(),"here");
         }
-        cache.add(pos,newCard);
+
+        if(pos>=cache.size()) {
+            cache.add(newCard);
+
+        }
+        else {
+            cache.add(pos, newCard);
+        }
+
+
+        writeViewAdapter.notifyDataSetChanged();
+        listView.requestLayout();
 
 
         Log.d(Integer.toString(cache.size()-1)+" Type: "+cache.get(cache.size()-1).getType() + " Link: "+cache.get(cache.size()-1).getLink(),"here");
-        displayCards(cache);
+       // displayCards(cache);
     }
 
     public void delete (View v){
         ListView listView = (ListView) findViewById(R.id.listviewwrite);
         int pos = listView.getPositionForView(v);
-        for (int i = 0;i<cache.size();i++){
-            View view = listView.getChildAt(i);
+        for (int i = 0;i<listView.getCount();i++){
+            View view = writeViewAdapter.getViewByPosition(i,listView);
             EditText typeField = (EditText) view.findViewById(R.id.typeField);
             EditText linkField = (EditText) view.findViewById(R.id.linkField);
             cache.get(i).setType(typeField.getText().toString());
+            writeViewAdapter.notifyDataSetChanged();
             cache.get(i).setLink(linkField.getText().toString());
+            writeViewAdapter.notifyDataSetChanged();
         }
         if (cache.size() > 1) {
             cache.remove(pos);
-            displayCards(cache);
+            writeViewAdapter.notifyDataSetChanged();
+            listView.requestLayout();
         }
         else {
             //do nothing

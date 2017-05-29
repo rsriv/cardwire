@@ -1,4 +1,4 @@
-package com.example.rishi.cardwire;
+package com.mapps.rishi.cardwire;
 
 /**
  * Created by rishi on 2017-01-21.

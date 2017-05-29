@@ -1,8 +1,6 @@
-package com.example.rishi.cardwire;
+package com.mapps.rishi.cardwire;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -140,11 +138,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
         Intent intent = getIntent();
         cardString = intent.getExtras().getString("card");
         Log.d("CardString ",cardString);
-        if(cardString==null || cardString.equals("")) {
-            Log.d("CARDSTRING NULL","");
-            cardString = readFromFile();
-        }
-        myCards = createCardsfromString(cardString);
+
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if(mNfcAdapter != null) {
@@ -162,6 +156,15 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
             Toast.makeText(this, "NFC not available on this device",
                     Toast.LENGTH_SHORT).show();
         }
+        if(cardString==null || cardString.equals("")) {
+            Log.d("CARDSTRING NULL","");
+            cardString = readFromFile();
+            if(mNfcAdapter != null) {
+                Toast.makeText(this, "Tap phones together now!",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+        myCards = createCardsfromString(cardString);
         displayCards(myCards);
     }
 

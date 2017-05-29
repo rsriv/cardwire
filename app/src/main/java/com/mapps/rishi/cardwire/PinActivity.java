@@ -1,4 +1,4 @@
-package com.example.rishi.cardwire;
+package com.mapps.rishi.cardwire;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
@@ -98,11 +99,15 @@ public class PinActivity extends AppCompatActivity {
         mSocket.on("new user",onNewMessage);
         mSocket.connect();
 
-        mSocket.emit("new user", "Return me a pin"); // TO HERE
+        if(readPin().equals("0")) {
+            mSocket.emit("new user", "Return me a pin"); // TO HERE
+        }
         String pin = readPin();
 
         TextView pinView = (TextView) findViewById(R.id.pin_text_view);
         pinView.setText(pin);
+        Toast.makeText(this, "Tap to begin using CardWire",
+                Toast.LENGTH_LONG).show();
 
     }
     @Override

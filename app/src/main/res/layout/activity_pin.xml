@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    tools:context="com.example.rishi.cardwire.PinActivity">
+    tools:context="com.mapps.rishi.cardwire.PinActivity">
     <ImageView
         android:src="@drawable/welcomeback"
         android:layout_width="fill_parent"
@@ -25,5 +25,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="180dp"
         android:id="@+id/pin_text_view"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:textColor="@color/hinttextclr" />
 </RelativeLayout>
