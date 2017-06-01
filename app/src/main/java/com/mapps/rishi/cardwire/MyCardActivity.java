@@ -22,11 +22,6 @@ public class MyCardActivity extends AppCompatActivity {
     public ArrayList<Card> cache = new ArrayList<Card>();
     public WriteViewAdapter writeViewAdapter;
     public ListView listView;
-    public void displayCards(ArrayList<Card> cards){
-
-
-
-    }
 
     public String createStringfromCards (ArrayList<Card> cards){
         String ret = "";
@@ -38,7 +33,6 @@ public class MyCardActivity extends AppCompatActivity {
         ret = ret + ";";
         return ret;
     }
-
 
     public ArrayList<Card> createCardsfromString (String s){
         String[] separated = s.split(";");
@@ -69,6 +63,7 @@ public class MyCardActivity extends AppCompatActivity {
         }
     }
 
+    //load cardString from file
     private String readFromFile(Context context) {
 
         String ret = "";
@@ -122,8 +117,8 @@ public class MyCardActivity extends AppCompatActivity {
 
     }
 
+    //write updated card to file
     public void saveCard (View v){
-        //WRITE CARD
         for (int i = 0;i<cache.size();i++){
             ListView listView = (ListView) findViewById(R.id.listviewwrite);
             View view = writeViewAdapter.getViewByPosition(i,listView);
@@ -140,12 +135,13 @@ public class MyCardActivity extends AppCompatActivity {
         Toast.makeText(this,"Card Saved!",Toast.LENGTH_SHORT).show();
     }
 
+    //add new list item
     public void add (View v){
         Card newCard = new Card("","");
         int pos = listView.getPositionForView(v)+1;
         Log.d("num ", Integer.toString(pos) + " listView.getCount() "+ Integer.toString(listView.getCount()) + " VS. cache.size()" +  Integer.toString(cache.size()));
 
-        //PROBLEM IS HERE
+        //iterate through listview and cache content
         for (int i = 0;i<listView.getCount()-1;i++){
             View view = writeViewAdapter.getViewByPosition(i,listView);
             EditText typeField = (EditText) view.findViewById(R.id.typeField);
@@ -155,26 +151,27 @@ public class MyCardActivity extends AppCompatActivity {
             Log.d(Integer.toString(i)+" Type: "+cache.get(i).getType() + " Link: "+cache.get(i).getLink(),"here");
         }
 
+        //add new card
         if(pos>=cache.size()) {
             cache.add(newCard);
-
         }
         else {
             cache.add(pos, newCard);
         }
 
-
+        //update writeviewadapter
         writeViewAdapter.notifyDataSetChanged();
         listView.requestLayout();
-
-
-        Log.d(Integer.toString(cache.size()-1)+" Type: "+cache.get(cache.size()-1).getType() + " Link: "+cache.get(cache.size()-1).getLink(),"here");
+        //Log.d(Integer.toString(cache.size()-1)+" Type: "+cache.get(cache.size()-1).getType() + " Link: "+cache.get(cache.size()-1).getLink(),"here");
        // displayCards(cache);
     }
 
+    //delete listview item
     public void delete (View v){
         ListView listView = (ListView) findViewById(R.id.listviewwrite);
         int pos = listView.getPositionForView(v);
+
+        //iterate through listview and cache cards
         for (int i = 0;i<listView.getCount();i++){
             View view = writeViewAdapter.getViewByPosition(i,listView);
             EditText typeField = (EditText) view.findViewById(R.id.typeField);
@@ -184,6 +181,8 @@ public class MyCardActivity extends AppCompatActivity {
             cache.get(i).setLink(linkField.getText().toString());
             writeViewAdapter.notifyDataSetChanged();
         }
+
+        //update writeViewAdapter
         if (cache.size() > 1) {
             cache.remove(pos);
             writeViewAdapter.notifyDataSetChanged();

@@ -30,6 +30,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
     public  ArrayList<Card> receivedCards = new ArrayList<Card>();
     public ReadViewAdapter readViewAdapter;
     public String cardString = "";
+
     public String createStringfromCards (ArrayList<Card> cards){
         String ret = "";
         for (int i = 0; i<cards.size();i++){
@@ -59,6 +60,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
         return ret;
     }
 
+    //create nfc payload
     public NdefRecord[] createRecords() {
         String toSend = createStringfromCards(myCards);
         NdefRecord[] records = new NdefRecord[2];
@@ -92,20 +94,18 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
 
     public void displayCards(ArrayList<Card> cards){
         readViewAdapter = new ReadViewAdapter(DisplayInfoActivity.this, cards);
-        // 2. Get ListView from activity_main.xml
+        //get ListView
         ListView listView = (ListView) findViewById(R.id.listviewread);
-        // 3. setListAdapter
+        //setListAdapter
         listView.setAdapter(readViewAdapter);
-
     }
 
+    //read cardString from file
     private String readFromFile() {
 
         String ret = "";
-
         try {
             InputStream inputStream = this.openFileInput("config.txt");
-
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -125,7 +125,6 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
         } catch (IOException e) {
             Toast.makeText(this,"Error: Please Restart CardWire",Toast.LENGTH_SHORT).show();
         }
-
         return ret;
     }
 
@@ -136,7 +135,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
         setContentView(R.layout.activity_display_info);
         //Load Card Data
         Intent intent = getIntent();
-        cardString = intent.getExtras().getString("card");
+        cardString = intent.getExtras().getString("card"); //NFC problem is here
         Log.d("CardString ",cardString);
 
 
@@ -145,10 +144,8 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
             //Check for NFC
             mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
             if(mNfcAdapter != null) {
-                //sets createNdefMessage
+                //set callbacks
                 mNfcAdapter.setNdefPushMessageCallback(this, this);
-
-                //Successfully sent message
                 mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
             }
         }
@@ -156,14 +153,18 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
             Toast.makeText(this, "NFC not available on this device",
                     Toast.LENGTH_SHORT).show();
         }
+
+        //prepare view based on cardString input
         if(cardString==null || cardString.equals("")) {
-            Log.d("CARDSTRING NULL","");
+            //Log.d("CARDSTRING NULL","");
             cardString = readFromFile();
             if(mNfcAdapter != null) {
                 Toast.makeText(this, "Tap phones together now!",
                         Toast.LENGTH_LONG).show();
             }
         }
+
+        //display user's card
         myCards = createCardsfromString(cardString);
         displayCards(myCards);
     }
@@ -171,24 +172,23 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
     @Override
     public void onResume() {
         super.onResume();
+        //prepare view based on cardString input
         if(cardString==null || cardString.equals("")) {
             cardString = readFromFile();
-
-        myCards = createCardsfromString(cardString);
-        handleNfcIntent(getIntent());
-        if(receivedCards.size() == 0){
-
-            displayCards(myCards);
-        }
-        else{
-            displayCards(receivedCards);
-        }
+            myCards = createCardsfromString(cardString);
+            handleNfcIntent(getIntent());
+            if(receivedCards.size() == 0){
+                displayCards(myCards);
+            }
+            else{
+                displayCards(receivedCards);
+            }
         }
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
-
+        //prepare view based on cardString input
         if(cardString==null || cardString.equals("")) {
             cardString = readFromFile();
             myCards = createCardsfromString(cardString);
@@ -200,6 +200,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
 
     @Override
     public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        //prepare view based on cardString input
         if(cardString==null || cardString.equals("")) {
             cardString = readFromFile();
             String cardString = readFromFile();
@@ -235,11 +236,12 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
                 NdefMessage receivedMessage = (NdefMessage) receivedArray[0];
                 NdefRecord[] attachedRecords = receivedMessage.getRecords();
 
+                //convert records to string
                 for (NdefRecord record:attachedRecords) {
                     String string = new String(record.getPayload());
-                    //Make sure we don't pass along our AAR (Android Application Record)
+
                     if (string.equals(getPackageName())) { continue; }
-                    receivedCards=createCardsfromString(string);
+                    receivedCards = createCardsfromString(string);
                     //Log.d(receivedCards.get(2).getType(),receivedCards.get(2).getLink());
                 }
                 Toast.makeText(this, "Received", Toast.LENGTH_LONG).show();
@@ -254,6 +256,7 @@ public class DisplayInfoActivity extends AppCompatActivity implements NfcAdapter
 
     @Override
     public void onNewIntent(Intent intent) {
+        //handle nfc
         handleNfcIntent(intent);
         displayCards(receivedCards);
     }

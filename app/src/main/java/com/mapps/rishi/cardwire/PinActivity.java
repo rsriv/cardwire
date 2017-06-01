@@ -19,13 +19,10 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 
 public class PinActivity extends AppCompatActivity {
-//HERE
-
     SocketApplication app;
     private Socket mSocket;
 
-//TO HERE
-
+    //Listens for PIN
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -41,7 +38,6 @@ public class PinActivity extends AppCompatActivity {
                         return;
                     }
 
-
                     TextView pinView = (TextView) findViewById(R.id.pin_text_view);
                     pinView.setText(readPin());
                     mSocket.emit("join", readPin());
@@ -50,7 +46,6 @@ public class PinActivity extends AppCompatActivity {
             });
         }
     };
-
 
     private void writePin (String newPin){
         SharedPreferences pref = getSharedPreferences("PREF_GENERIC", Context.MODE_PRIVATE);
@@ -73,43 +68,43 @@ public class PinActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pin);
-        //HERE -> TODO: - request pin from server //DONE - receive pin from server and write to shared prefs - read pin from shared prefs//done
+        //TODO: - request pin from server //DONE - receive pin from server and write to shared prefs - read pin from shared prefs//done
         //Connect to Socket.io
         app = (SocketApplication) getApplication();
         Log.d(app.getSocket().toString(),"");
 
-        try
-
-        {
+        try {
             mSocket= app.getSocket();
-
         }
-
         catch(NullPointerException e){
-            Log.d("failed class","123");
             try {
                 mSocket = IO.socket(Constants.SERVER_URL);
             }
             catch (URISyntaxException e1){
 
             }
-
         }
 
+        //connect listeners to socket
         mSocket.on("new user",onNewMessage);
         mSocket.connect();
 
+        //request new pin
         if(readPin().equals("0")) {
-            mSocket.emit("new user", "Return me a pin"); // TO HERE
+            mSocket.emit("new user", "Return me a pin");
         }
+
         String pin = readPin();
 
+        //set pinView to pin
         TextView pinView = (TextView) findViewById(R.id.pin_text_view);
         pinView.setText(pin);
         Toast.makeText(this, "Tap to begin using CardWire",
                 Toast.LENGTH_LONG).show();
 
     }
+
+    //continue on touch
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         finish();

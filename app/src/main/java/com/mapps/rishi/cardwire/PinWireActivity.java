@@ -31,6 +31,8 @@ public class PinWireActivity extends AppCompatActivity {
     private Socket mSocket;
     private Context context;
     private boolean isRunning = false;
+
+    //listener for 'add response'
     private Emitter.Listener addResp = new Emitter.Listener() { //called when add response is received
 
         @Override
@@ -87,6 +89,7 @@ public class PinWireActivity extends AppCompatActivity {
         }
     };
 
+    //listener for 'add request'
     private Emitter.Listener addReq = new Emitter.Listener() { //called when add request is received
 
         @Override
@@ -105,6 +108,8 @@ public class PinWireActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         return;
                     }
+
+                    //build dialog boxes
                     if(isRunning) {
                         AlertDialog.Builder box = new AlertDialog.Builder(PinWireActivity.this);
                         box.setMessage("Share card with " + pin + "?")
@@ -158,12 +163,12 @@ public class PinWireActivity extends AppCompatActivity {
                         alert.setTitle("Request from " + pin);
                         alert.show();
                     }
-
                 }
             });
         }
     };
 
+    //read cardString from file
     private String readFromFile() {
 
         String ret = "";
@@ -194,6 +199,7 @@ public class PinWireActivity extends AppCompatActivity {
         return ret;
     }
 
+    //return PIN
     private String readPin (){
         SharedPreferences pref = getSharedPreferences("PREF_GENERIC", Context.MODE_PRIVATE);
         String defaultValue = getResources().getString(R.string.pin_key_default);
@@ -202,12 +208,15 @@ public class PinWireActivity extends AppCompatActivity {
         return pin;
     }
 
+    //onClick method for adding user
     public void addUser (View v) {
         mSocket.emit("join", readPin());
         JSONObject obj = new JSONObject();
         EditText e = (EditText) findViewById(R.id.add_pin);
         String to = e.getText().toString();
         String card = readFromFile();
+
+        //add data to JSON
         try {
             obj.put("to", to);
             obj.put("from", readPin());
@@ -215,9 +224,10 @@ public class PinWireActivity extends AppCompatActivity {
         }
         catch (JSONException x){}
         Log.d("Sent ",obj.toString());
+
+        //send request
         mSocket.emit("add request", obj);
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,8 +250,9 @@ public class PinWireActivity extends AppCompatActivity {
             catch (URISyntaxException e1){
 
             }
-
         }
+
+        //add listeners to socket
         mSocket.on("add request",addReq);
         mSocket.on("add response",addResp);
         mSocket.connect();

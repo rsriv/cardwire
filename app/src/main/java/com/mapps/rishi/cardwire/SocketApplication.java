@@ -12,6 +12,8 @@ import java.net.URISyntaxException;
 public class SocketApplication extends Application {
     private static SocketApplication xxx;
     public static Context context = null;
+
+
     private Socket mSocket;
     {
         try {

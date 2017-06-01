@@ -38,15 +38,18 @@ public class MainActivity extends AppCompatActivity {
     private Socket mSocket;
     final Context context = this;
     private boolean isRunning = false;
-    private Emitter.Listener addResp = new Emitter.Listener() { //called when add response is received
 
+    //listener for rx 'add response'
+    private Emitter.Listener addResp = new Emitter.Listener() { //called when add response is received
         @Override
         public void call(final Object... args) {
             runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-                    Log.d("add ", "response");
+                    //log.d("add ", "response");
+
+                    //extract data from JSON
                     JSONObject data = (JSONObject) args[0];
                     final String resp;
                     final String from;
@@ -58,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         return;
                     }
+
+                    //Decline dialog
                     if (resp.equals("n")) {
                         if(isRunning) {
                             AlertDialog.Builder box = new AlertDialog.Builder(MainActivity.this);
@@ -75,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                             alert.show();
                         }
                     }
-                    else { //response is yes
+                    else { //yes dialog
                         if(isRunning) {
                             Log.d("Response: ", "YES");
                             Intent intent = new Intent(context, DisplayInfoActivity.class);
@@ -94,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    //listener for rx 'add request'
     private Emitter.Listener addReq = new Emitter.Listener() { //called when add request is received
 
         @Override
@@ -112,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         return;
                     }
+
+                    //display request dialog box
                     if(isRunning) {
                         AlertDialog.Builder box = new AlertDialog.Builder(MainActivity.this);
                         box.setMessage("Share card with " + pin + "?")
@@ -119,7 +127,8 @@ public class MainActivity extends AppCompatActivity {
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
-                                        //send add response yes
+
+                                        //send add response 'yes'
                                         JSONObject obj = new JSONObject();
                                         String card = readFromFile();
                                         Log.d("Card Sent from usr: ", card);
@@ -132,8 +141,6 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                         Log.d("Sent ", "YES");
                                         mSocket.emit("add response", obj);
-
-
                                         Intent intent = new Intent(context, DisplayInfoActivity.class);
                                         String message = "";
                                         try {
@@ -148,13 +155,15 @@ public class MainActivity extends AppCompatActivity {
                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
-                                        //send add response yes
+
+                                        //send add response 'no'
                                         JSONObject obj = new JSONObject();
                                         try {
                                             obj.put("response", "n");
                                             obj.put("to", pin);
                                             obj.put("from", readPin());
-                                        } catch (JSONException x) {
+                                        }
+                                        catch (JSONException x) {
                                         }
                                         Log.d("Sent ", "NO");
                                         mSocket.emit("add response", obj);
@@ -170,6 +179,8 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     };
+
+    //read cardString from file
     private String readFromFile() {
 
         String ret = "";
@@ -227,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        //write default card to file if opened for first time.
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         boolean previouslyStarted = prefs.getBoolean(getString(R.string.pref_previously_started), false);
         if(!previouslyStarted) {

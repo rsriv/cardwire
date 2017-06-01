@@ -5,6 +5,6 @@ package com.mapps.rishi.cardwire;
  */
 
 public class Constants {
-    public static final String SERVER_URL = "";
+    public static final String SERVER_URL = "https://obscure-anchorage-96950.herokuapp.com";
 
 }
